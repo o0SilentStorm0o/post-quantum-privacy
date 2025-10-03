@@ -1,33 +1,27 @@
 @import 'tailwindcss';
 @import "tw-animate-css";
 
-@layer base {
-  * {
-    @apply border-border
-  }
-}
-
 :root {
   --background: oklch(0.98 0 0);
   --foreground: oklch(0.15 0 0);
-  --card: oklch(0.96 0 0);
+  --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0 0);
-  --popover: oklch(0.96 0 0);
+  --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.15 0 0);
-  --primary: oklch(0.3 0.15 250);
+  --primary: oklch(0.2 0 0);
   --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.5 0.15 150);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.94 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.7 0.2 200);
-  --accent-foreground: oklch(0.15 0 0);
-  --destructive: oklch(0.6 0.15 50);
+  --secondary: oklch(0.95 0 0);
+  --secondary-foreground: oklch(0.2 0 0);
+  --muted: oklch(0.95 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.95 0 0);
+  --accent-foreground: oklch(0.2 0 0);
+  --destructive: oklch(0.6 0.2 30);
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(0.9 0 0);
   --input: oklch(0.9 0 0);
   --ring: oklch(0.7 0.2 200);
-  --radius: 0.75rem;
+  --radius: 0.5rem;
 }
 
 @theme {
@@ -96,91 +90,16 @@ body {
   @apply font-semibold text-foreground;
 }
 
-.prose-technical code {
-  @apply bg-muted px-2 py-1 rounded text-sm font-mono;
-}
-
-.prose-technical pre {
-  @apply bg-muted p-4 rounded-lg overflow-x-auto mb-4;
-}
-
-.prose-technical pre code {
-  @apply bg-transparent p-0;
-}
-
-.section-marker {
-  scroll-margin-top: 6rem;
-  transition: background-color 0.3s ease;
-}
-
-.section-marker:target {
-  background-color: oklch(0.7 0.2 200 / 0.1);
-  border-radius: 0.75rem;
-  animation: highlight 2s ease-out;
-}
-
-/* Smooth loading animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+@keyframes highlight {
+  0% {
+    background-color: oklch(0.7 0.2 200 / 0.2);
+    transform: scale(1.02);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  50% {
+    background-color: oklch(0.7 0.2 200 / 0.15);
   }
-}
-
-.fade-in-up {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-/* Enhanced section highlighting */
-.section-highlight {
-  position: relative;
-  overflow: hidden;
-}
-
-.section-highlight::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    oklch(0.7 0.2 200 / 0.1),
-    transparent
-  );
-  transition: left 0.8s ease-out;
-}
-
-.section-highlight.active::before {
-  left: 100%;
-}
-
-/* Navigation button improvements */
-.nav-button {
-  position: relative;
-  overflow: hidden;
-}
-
-.nav-button::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: oklch(0.7 0.2 200 / 0.1);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.3s ease, height 0.3s ease;
-}
-
-.nav-button:hover::after {
-  width: 100%;
-  height: 100%;
+  100% {
+    background-color: oklch(0.7 0.2 200 / 0.05);
+    transform: scale(1);
+  }
 }

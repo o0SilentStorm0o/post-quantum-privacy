@@ -55,13 +55,11 @@
   --radius-lg: calc(var(--radius) * 1.5);
   --radius-xl: calc(var(--radius) * 2);
   --radius-2xl: calc(var(--radius) * 3);
-  --radius-full: 9999px;
 }
 
 @layer base {
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
     line-height: 1.6;
   }
 }

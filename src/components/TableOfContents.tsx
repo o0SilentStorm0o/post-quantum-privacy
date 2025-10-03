@@ -11,7 +11,12 @@ export function TableOfContents({ sections }: TableOfContentsProps) {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const headerHeight = 80 // Height of sticky header + some padding
+      const elementPosition = element.offsetTop - headerHeight
+      window.scrollTo({
+        top: elementPosition,
+        behavior: 'smooth'
+      })
     }
   }
 

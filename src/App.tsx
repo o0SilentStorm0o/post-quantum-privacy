@@ -15,16 +15,9 @@ const sections = [
   { id: "cryptography", title: "Cryptographic Choices", level: 1 },
   { id: "transaction-model", title: "Transaction Model", level: 1 },
   { id: "spend-flow", title: "One-of-Many Spend Flow", level: 1 },
-  { id: "consensus", title: "Block & Consensus", level: 1 },
-  { id: "network", title: "Network Layer", level: 1 },
-  { id: "light-clients", title: "Light Clients", level: 1 },
   { id: "wallet-ux", title: "Wallet UX & Compliance", level: 1 },
-  { id: "disclosure", title: "Selective Disclosure", level: 1 },
-  { id: "governance", title: "Treasury & Governance", level: 1 },
-  { id: "compliance", title: "Compliance & Exchange Integration", level: 1 },
-  { id: "economics", title: "Economics & Tokenomics", level: 1 },
-  { id: "security", title: "Security & Audits", level: 1 },
   { id: "roadmap", title: "Roadmap", level: 1 },
+  { id: "conclusion", title: "Conclusion", level: 1 },
 ]
 
 const transactionExample = `TX {
@@ -142,7 +135,7 @@ function App() {
 
             <Separator />
 
-            <TechnicalSection title="1. Motivation & Goals" defaultOpen={true}>
+            <TechnicalSection title="1. Motivation & Goals" defaultOpen={true} id="motivation">
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-destructive">Problem</h3>
                 <p>
@@ -165,7 +158,7 @@ function App() {
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="2. Threat Model">
+            <TechnicalSection title="2. Threat Model" id="threat-model">
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Adversaries Considered</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -230,7 +223,7 @@ function App() {
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="3. High-level Architecture">
+            <TechnicalSection title="3. High-level Architecture" id="architecture">
               <div className="space-y-4">
                 <ul className="space-y-3">
                   <li><strong>Layer-1 UTXO model</strong> with privacy default (stealth outputs + confidential amounts)</li>
@@ -250,7 +243,7 @@ function App() {
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="4. Cryptographic Choices & Rationale">
+            <TechnicalSection title="4. Cryptographic Choices & Rationale" id="cryptography">
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-3">Primary Signature: CRYSTALS-Dilithium</h3>
@@ -296,7 +289,7 @@ function App() {
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="5. Transaction Model (UTXO, Privacy Features)">
+            <TechnicalSection title="5. Transaction Model (UTXO, Privacy Features)" id="transaction-model">
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-3">Overview</h3>
@@ -362,7 +355,7 @@ function App() {
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="6. One-of-Many Spend Flow (Plain English)">
+            <TechnicalSection title="6. One-of-Many Spend Flow (Plain English)" id="spend-flow">
               <div className="space-y-4">
                 <p>When a wallet wants to spend a UTXO privately:</p>
                 <ol className="list-decimal list-inside space-y-2 ml-4">
@@ -383,7 +376,7 @@ function App() {
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="10. Wallet UX & Compliance Modes">
+            <TechnicalSection title="10. Wallet UX & Compliance Modes" id="wallet-ux">
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-3">Default UX</h3>
@@ -414,7 +407,7 @@ function App() {
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="17. Roadmap & MVP">
+            <TechnicalSection title="17. Roadmap & MVP" id="roadmap">
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <Card className="border-primary/20 bg-primary/5">
@@ -473,7 +466,7 @@ function App() {
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="21. Conclusion">
+            <TechnicalSection title="21. Conclusion" id="conclusion">
               <div className="space-y-4">
                 <p>
                   PQ-PRIV aims to prove that <strong>privacy and legal compliance are not mutually exclusive</strong> and 

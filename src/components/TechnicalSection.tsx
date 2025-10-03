@@ -9,9 +9,10 @@ interface TechnicalSectionProps {
   children: React.ReactNode
   defaultOpen?: boolean
   level?: 1 | 2 | 3
+  id?: string
 }
 
-export function TechnicalSection({ title, children, defaultOpen = false, level = 2 }: TechnicalSectionProps) {
+export function TechnicalSection({ title, children, defaultOpen = false, level = 2, id }: TechnicalSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen)
 
   const headingClasses = {
@@ -33,7 +34,7 @@ export function TechnicalSection({ title, children, defaultOpen = false, level =
   }
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-4">
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-4 section-marker" id={id}>
       <CollapsibleTrigger className="group flex items-center justify-between w-full p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors">
         {renderHeading()}
         <CaretDown 

@@ -1,6 +1,12 @@
 @import 'tailwindcss';
 @import "tw-animate-css";
 
+@layer base {
+  * {
+    @apply border-border;
+  }
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -17,6 +23,7 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -39,6 +46,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -51,59 +59,9 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
     line-height: 1.6;
-  }
-}
-
-.font-mono {
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.prose-technical h1 {
-  @apply text-4xl font-bold text-foreground mb-6 tracking-tight;
-}
-
-.prose-technical h2 {
-  @apply text-2xl font-semibold text-foreground mb-4 mt-8 tracking-tight;
-}
-
-.prose-technical h3 {
-  @apply text-xl font-medium text-foreground mb-3 mt-6;
-}
-
-.prose-technical p {
-  @apply text-base text-foreground mb-4 leading-relaxed;
-}
-
-.prose-technical ul {
-  @apply mb-4 space-y-2;
-}
-
-.prose-technical li {
-  @apply text-foreground leading-relaxed;
-}
-
-.prose-technical strong {
-  @apply font-semibold text-foreground;
-}
-
-@keyframes highlight {
-  0% {
-    background-color: oklch(0.7 0.2 200 / 0.2);
-    transform: scale(1.02);
-  }
-  50% {
-    background-color: oklch(0.7 0.2 200 / 0.15);
-  }
-  100% {
-    background-color: oklch(0.7 0.2 200 / 0.05);
-    transform: scale(1);
   }
 }

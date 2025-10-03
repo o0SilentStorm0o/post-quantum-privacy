@@ -1,3 +1,4 @@
+import React from "react"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { CaretDown } from "@phosphor-icons/react"
 import { useState } from "react"

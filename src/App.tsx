@@ -1,11 +1,12 @@
 import { Shield, Eye, Certificate, Cpu, Network, Lock } from "@phosphor-icons/react"
 import { KeyConcept } from "@/components/KeyConcept"
 import { TableOfContents } from "@/components/TableOfContents"
-import { TechnicalSection } from "@/components/TechnicalSection"
+import { TechnicalSection, TechnicalSectionRef } from "@/components/TechnicalSection"
 import { CodeBlock } from "@/components/CodeBlock"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { useRef } from "react"
 
 const sections = [
   { id: "overview", title: "Overview", level: 1 },

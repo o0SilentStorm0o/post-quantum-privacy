@@ -3,31 +3,31 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border
   }
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --radius: 0.5rem;
+  --background: oklch(0.98 0 0);
+  --foreground: oklch(0.15 0 0);
+  --card: oklch(0.96 0 0);
+  --card-foreground: oklch(0.15 0 0);
+  --popover: oklch(0.96 0 0);
+  --popover-foreground: oklch(0.15 0 0);
+  --primary: oklch(0.3 0.15 250);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.5 0.15 150);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.7 0.2 200);
+  --accent-foreground: oklch(0.15 0 0);
+  --destructive: oklch(0.6 0.15 50);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.9 0 0);
+  --ring: oklch(0.7 0.2 200);
+  --radius: 0.75rem;
 }
 
 @theme {
@@ -50,6 +50,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) * 1.5);
@@ -58,9 +59,55 @@
   --radius-full: 9999px;
 }
 
-@layer base {
-  body {
-    @apply bg-background text-foreground;
-    line-height: 1.6;
-  }
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.prose-technical h1 {
+  @apply text-4xl font-bold text-foreground mb-6 tracking-tight;
+}
+
+.prose-technical h2 {
+  @apply text-2xl font-semibold text-foreground mb-4 mt-8 tracking-tight;
+}
+
+.prose-technical h3 {
+  @apply text-xl font-medium text-foreground mb-3 mt-6;
+}
+
+.prose-technical p {
+  @apply text-base text-foreground mb-4 leading-relaxed;
+}
+
+.prose-technical ul {
+  @apply mb-4 space-y-2;
+}
+
+.prose-technical li {
+  @apply text-foreground leading-relaxed;
+}
+
+.prose-technical strong {
+  @apply font-semibold text-foreground;
+}
+
+.prose-technical code {
+  @apply bg-muted px-2 py-1 rounded text-sm font-mono;
+}
+
+.prose-technical pre {
+  @apply bg-muted p-4 rounded-lg overflow-x-auto mb-4;
+}
+
+.prose-technical pre code {
+  @apply bg-transparent p-0;
+}
+
+.section-marker {
+  scroll-margin-top: 6rem;
 }

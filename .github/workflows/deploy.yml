@@ -1,10 +1,10 @@
-name: build-and-deploy
+name: build-to-deploy-branch
 on:
   push:
     branches: [ main ]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,12 +22,14 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=1536
 
-      - name: Deploy to server via rsync
-        uses: burnett01/rsync-deployments@7.0.1
-        with:
-          switches: -avz --delete
-          path: dist/
-          remote_path: /var/www/davidstrnadel.lol/
-          remote_host: ${{ secrets.SSH_HOST }}
-          remote_user: deploy
-          remote_key: ${{ secrets.SSH_KEY }}
+      - name: Push dist to deploy branch
+        run: |
+          cd dist
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b deploy
+          git add -A
+          git commit -m "Deploy build from ${{ github.sha }} at $(date -u +%Y-%m-%d-%H:%M:%S)"
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push -f origin deploy

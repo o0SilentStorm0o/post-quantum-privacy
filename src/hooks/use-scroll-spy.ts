@@ -6,13 +6,23 @@ export function useScrollSpy(sectionIds: string[], offset = 100) {
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + offset
+      const atBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 4
+
+      if (atBottom && sectionIds.length > 0) {
+        setActiveSection(sectionIds[sectionIds.length - 1])
+        return
+      }
 
       for (let i = sectionIds.length - 1; i >= 0; i--) {
         const element = document.getElementById(sectionIds[i])
         if (element && element.offsetTop <= scrollPosition) {
           setActiveSection(sectionIds[i])
-          break
+          return
         }
+      }
+
+      if (sectionIds.length > 0) {
+        setActiveSection(sectionIds[0])
       }
     }
 

@@ -35,7 +35,7 @@ export function TechnicalSection({ title, children, defaultOpen = false, level =
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-4 section-marker" id={id}>
-      <CollapsibleTrigger className="group flex items-center justify-between w-full p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+      <CollapsibleTrigger className="group flex w-full items-center justify-between rounded-2xl border border-border/60 bg-background/80 px-5 py-4 text-left shadow-sm shadow-primary/5 transition-all hover:border-primary/40 hover:bg-primary/5">
         {renderHeading()}
         <CaretDown 
           className={cn(
@@ -44,7 +44,7 @@ export function TechnicalSection({ title, children, defaultOpen = false, level =
           )} 
         />
       </CollapsibleTrigger>
-      <CollapsibleContent className="space-y-4 px-4 pb-4">
+      <CollapsibleContent className="space-y-4 rounded-2xl border border-dashed border-border/40 bg-background/70 px-6 pb-6 pt-4 shadow-inner shadow-primary/5">
         <div className="prose-technical">
           {children}
         </div>

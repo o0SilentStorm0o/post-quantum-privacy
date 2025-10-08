@@ -23,7 +23,7 @@ export function KeyConcept({ title, description, icon, variant }: KeyConceptProp
   }
 
   return (
-    <Card className={`transition-all duration-300 hover:shadow-lg ${variantStyles[variant]}`}>
+    <Card className={`transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${variantStyles[variant]}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-background/50">

@@ -1,4 +1,20 @@
-import { Shield, Eye, Certificate, Cpu, Network, Lock } from "@phosphor-icons/react"
+import { useEffect, useState } from "react"
+
+import {
+  Shield,
+  Eye,
+  Certificate,
+  Cpu,
+  Network,
+  Lock,
+  RocketLaunch,
+  ArrowRight,
+  PaperPlaneTilt,
+  Sparkle,
+  UsersThree,
+  ChartLineUp,
+  ListNumbers
+} from "@phosphor-icons/react"
 import { KeyConcept } from "@/components/KeyConcept"
 import { TableOfContents } from "@/components/TableOfContents"
 import { TechnicalSection } from "@/components/TechnicalSection"
@@ -6,502 +22,551 @@ import { CodeBlock } from "@/components/CodeBlock"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/ThemeToggle"
+import { ScrollToTop } from "@/components/ScrollToTop"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { LanguageSelector } from "@/components/LanguageSelector"
+import { translations, defaultLocale, type Locale } from "@/i18n"
 
-const sections = [
-  { id: "overview", title: "Overview", level: 1 },
-  { id: "motivation", title: "Motivation & Goals", level: 1 },
-  { id: "threat-model", title: "Threat Model", level: 1 },
-  { id: "architecture", title: "Architecture", level: 1 },
-  { id: "cryptography", title: "Cryptographic Choices", level: 1 },
-  { id: "transaction-model", title: "Transaction Model", level: 1 },
-  { id: "spend-flow", title: "One-of-Many Spend Flow", level: 1 },
-  { id: "wallet-ux", title: "Wallet UX & Compliance", level: 1 },
-  { id: "roadmap", title: "Roadmap", level: 1 },
-  { id: "conclusion", title: "Conclusion", level: 1 },
+const LOCALE_STORAGE_KEY = "pq-priv-locale"
+
+function resolveInitialLocale(): Locale {
+  if (typeof window === "undefined") {
+    return defaultLocale
+  }
+
+  const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY)
+  if (stored === "en" || stored === "cs" || stored === "de") {
+    return stored
+  }
+
+  return defaultLocale
+}
+
+const highlightIcons = [
+  <UsersThree className="h-5 w-5" />,
+  <Sparkle className="h-5 w-5" />,
+  <ChartLineUp className="h-5 w-5" />
 ]
 
-const transactionExample = `TX {
-  version: 1,
-  inputs: [
-    {
-      prev_txid: 0x..., // 32B
-      prev_index: uint32,
-      ann_link_tag: 32B,
-      one_of_many_proof: <STARKblob>,
-      pq_signature: { alg_tag: 0x01, sig_blob: ... }
-    }
-  ],
-  outputs: [
-    {
-      stealth_blob: <ephemeral_pubkey + nonce>,
-      value_commitment: 32B,
-      output_meta: { deposit_flag: bool, deposit_id: optional 32B }
-    }
-  ],
-  witness: {
-    range_proofs: [<STARKblob>],
-    stamp: timestamp,
-    extra: ...
-  },
-  locktime: uint32
-}`
+const threatIcons = [
+  <Cpu className="h-4 w-4" />,
+  <Network className="h-4 w-4" />,
+  <Lock className="h-4 w-4" />,
+  <Certificate className="h-4 w-4" />
+]
 
 function App() {
-  return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur">
-        <div className="container flex h-16 items-center">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-primary rounded-lg">
-              <Shield className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">PQ-PRIV</h1>
-              <p className="text-xs text-muted-foreground">Post-Quantum Privacy Layer-1</p>
-            </div>
-          </div>
-          <div className="ml-auto flex items-center space-x-2">
-            <Badge variant="outline">Version 0.9 Draft</Badge>
-            <Badge className="bg-accent text-accent-foreground">Whitepaper</Badge>
-          </div>
-        </div>
-      </header>
+  const [locale, setLocale] = useState<Locale>(() => resolveInitialLocale())
+  const [isMobileTocOpen, setMobileTocOpen] = useState(false)
 
-      <div className="container py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <aside className="lg:col-span-1 order-2 lg:order-1">
-            <TableOfContents sections={sections} />
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(LOCALE_STORAGE_KEY, locale)
+      document.documentElement.lang = locale
+    }
+  }, [locale])
+
+  const t = translations[locale]
+  const hero = t.hero
+  const highlights = t.highlights
+  const keyConcepts = t.keyConcepts
+  const sectionCopy = t.sections
+  const sections = t.tableOfContents.sections
+  const tocLabels = t.tableOfContents.labels
+  const footerLine2 = t.footer.line2.replace("${new Date().getFullYear()}", new Date().getFullYear().toString())
+  const handleNavClick = (id: string) => {
+    const element = document.getElementById(id)
+    if (element) {
+      const headerHeight = 80
+      const y = element.getBoundingClientRect().top + window.scrollY - headerHeight
+      window.scrollTo({ top: y, behavior: "smooth" })
+      setMobileTocOpen(false)
+    }
+  }
+
+  return (
+    <div className="relative min-h-screen bg-background text-foreground">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="app-background-grid" />
+        <div className="app-gradient-glow" />
+      </div>
+
+      <div className="relative z-10 flex min-h-screen flex-col">
+        <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur">
+          <div className="container flex h-14 items-center gap-4 sm:h-16 sm:gap-6">
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl bg-primary/10 p-2 ring-1 ring-primary/30">
+                <Shield className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">{t.header.projectTagline}</p>
+                <h1 className="text-lg font-semibold tracking-tight">{t.header.projectTitle}</h1>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="ml-auto flex h-10 w-10 items-center justify-center rounded-full border-border/60 bg-background/80 text-muted-foreground transition-colors hover:text-foreground md:hidden"
+              onClick={() => setMobileTocOpen(true)}
+              aria-label={tocLabels.mobileAriaLabel}
+            >
+              <ListNumbers className="h-5 w-5" />
+            </Button>
+
+            <nav className="hidden items-center gap-1 rounded-full border border-border/70 bg-background/60 px-1.5 py-1 shadow-sm backdrop-blur md:ml-auto md:flex">
+              {t.header.navLinks.map(link => (
+                <button
+                  key={link.id}
+                  className="rounded-full px-3 py-1 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground"
+                  onClick={() => handleNavClick(link.id)}
+                >
+                  {link.title}
+                </button>
+              ))}
+            </nav>
+
+            <div className="flex items-center gap-2">
+              <LanguageSelector
+                locale={locale}
+                onChange={nextLocale => setLocale(nextLocale)}
+                label={t.languageSelector.label}
+              />
+              <ThemeToggle labels={t.themeToggle} />
+              <Button
+                variant="ghost"
+                className="hidden items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground md:flex"
+                onClick={() => handleNavClick("roadmap")}
+              >
+                <RocketLaunch className="h-4 w-4" />
+                {t.header.roadmapCta}
+              </Button>
+            </div>
+          </div>
+        </header>
+
+  <div className="container flex-1 py-10 sm:py-12">
+  <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 lg:gap-8">
+          <aside className="order-2 hidden lg:order-1 lg:col-span-1 lg:block">
+            <TableOfContents sections={sections} labels={tocLabels} />
           </aside>
 
-          <main className="lg:col-span-3 order-1 lg:order-2 space-y-8">
-            <section id="overview" className="section-marker space-y-6">
-              <div className="text-center space-y-4">
-                <h1 className="text-4xl font-bold tracking-tight">
-                  PQ-PRIV: A Post-Quantum, Privacy-First Layer-1
-                </h1>
-                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                  A new layer-1 cryptocurrency designed from day one to deliver post-quantum cryptographic 
-                  resilience, strong transaction privacy, and practical throughput for real adoption.
-                </p>
-                <div className="flex flex-wrap justify-center gap-2 mt-4">
-                  <Badge variant="outline">Version 0.9 Draft</Badge>
-                  <Badge variant="outline">Date: 2025-10-03</Badge>
-                  <Badge variant="outline">Authors: Project Team (pseudonymous)</Badge>
+          <main className="lg:col-span-3 order-1 lg:order-2 space-y-12">
+            <div className="lg:hidden">
+              <Sheet modal={false} open={isMobileTocOpen} onOpenChange={setMobileTocOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex w-full items-center justify-between rounded-full border-border/60 bg-background/80 px-5 py-3 text-sm font-semibold"
+                  >
+                    <span className="flex items-center gap-2">
+                      <ListNumbers className="h-4 w-4 text-primary" />
+                      {tocLabels.triggerLabel}
+                    </span>
+                    <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">{tocLabels.triggerHint}</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent
+                  forceMount
+                  side="bottom"
+                  className="max-h-[85vh] overflow-hidden rounded-t-3xl border border-border/60"
+                >
+                  <SheetHeader className="pb-0">
+                    <SheetTitle className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                      {tocLabels.sheetTitle}
+                    </SheetTitle>
+                    <SheetDescription>
+                      {tocLabels.sheetDescription}
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="overflow-y-auto px-1 pb-6">
+                    <TableOfContents
+                      sections={sections}
+                      variant="mobile"
+                      labels={tocLabels}
+                      onNavigate={() => setMobileTocOpen(false)}
+                    />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+            <section id="overview" className="section-marker space-y-10">
+              <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-primary/10 via-background to-accent/10 p-6 shadow-xl shadow-primary/5 sm:p-10 lg:p-12">
+                <div className="pointer-events-none absolute inset-0 opacity-70">
+                  <div className="hero-orbit" />
+                  <div className="hero-noise" />
+                </div>
+                <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
+                  <div className="space-y-7">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+                      <Sparkle className="h-3.5 w-3.5" />
+                      {hero.badge}
+                    </div>
+                    <div className="space-y-6">
+                      <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+                        {hero.title}
+                      </h1>
+                      <p className="text-base text-muted-foreground/90 sm:text-lg">
+                        {hero.description}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      <Button
+                        size="lg"
+                        className="w-full rounded-full px-6 text-sm font-semibold sm:w-auto"
+                        onClick={() => handleNavClick(hero.ctas.primary.target)}
+                      >
+                        <RocketLaunch className="mr-2 h-4 w-4" />
+                        {hero.ctas.primary.label}
+                      </Button>
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="w-full rounded-full border-border/70 px-6 text-sm font-semibold sm:w-auto"
+                        onClick={() => handleNavClick(hero.ctas.secondary.target)}
+                      >
+                        <ArrowRight className="mr-2 h-4 w-4" />
+                        {hero.ctas.secondary.label}
+                      </Button>
+                      <Button
+                        size="lg"
+                        variant="ghost"
+                        className="w-full rounded-full px-6 text-sm font-semibold text-muted-foreground hover:text-foreground sm:w-auto"
+                        onClick={() => handleNavClick(hero.ctas.tertiary.target)}
+                      >
+                        <PaperPlaneTilt className="mr-2 h-4 w-4" />
+                        {hero.ctas.tertiary.label}
+                      </Button>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      {hero.stats.map((item, index) => (
+                        <div
+                          key={item.label}
+                          className="animate-floaty rounded-2xl border border-border/60 bg-background/80 p-4 text-left shadow-sm backdrop-blur"
+                          style={{ animationDelay: `${index * 0.18}s` }}
+                        >
+                          <p className="text-2xl font-semibold tracking-tight text-foreground">
+                            {item.value}
+                          </p>
+                          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/80">
+                            {item.label}
+                          </p>
+                          <p className="mt-2 text-xs text-muted-foreground/80">
+                            {item.description}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground/80">
+                      {hero.metaBadges.map(meta => (
+                        <Badge key={meta} variant="outline">
+                          {meta}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Card className="border-border/50 bg-background/90 backdrop-blur">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                        <Cpu className="h-4 w-4 text-primary" />
+                        {hero.tldr.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4 text-sm text-muted-foreground">
+                      {hero.tldr.paragraphs.map(paragraph => (
+                        <p key={paragraph}>{paragraph}</p>
+                      ))}
+                      <div className="space-y-2 text-xs">
+                        {hero.tldr.bullets.map(bullet => (
+                          <p key={bullet} dangerouslySetInnerHTML={{ __html: bullet }} />
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
 
-              <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Cpu className="h-5 w-5" />
-                    TL;DR (Elevator Pitch)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-base leading-relaxed">
-                    PQ-PRIV is a new layer-1 cryptocurrency designed from day one to deliver three core 
-                    guarantees simultaneously: <strong>(1) post-quantum cryptographic resilience</strong> for 
-                    signatures and verification, <strong>(2) strong transaction privacy</strong> comparable to 
-                    best privacy coins (stealth addresses, unlinkability, confidential amounts), and{" "}
-                    <strong>(3) practical throughput & UX</strong> for real adoption (compact blocks, light 
-                    clients, L2 rollups). The design intentionally embeds selective, user-controlled disclosure 
-                    mechanisms and exchange-friendly deposit workflows so institutions can meet AML obligations 
-                    without destroying user privacy.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                {highlights.map((highlight, index) => {
+                  const icon = highlightIcons[index] ?? highlightIcons[0]
+                  return (
+                    <Card key={highlight.title} className="border-border/60 bg-background/80 p-5 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 sm:p-6">
+                      <div className="mb-4 inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary/10 p-2 text-primary">
+                        {icon}
+                      </div>
+                      <CardTitle className="text-lg font-semibold">
+                        {highlight.title}
+                      </CardTitle>
+                      <p className="mt-3 text-sm text-muted-foreground">
+                        {highlight.description}
+                      </p>
+                    </Card>
+                  )
+                })}
+              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <KeyConcept
-                  title="Post-Quantum Security"
-                  description="CRYSTALS-Dilithium signatures and STARK-based proofs ensure resistance to quantum attacks using Shor's algorithm."
+                  title={keyConcepts.security.title}
+                  description={keyConcepts.security.description}
                   icon={<Shield className="h-6 w-6 text-primary" />}
                   variant="security"
                 />
                 <KeyConcept
-                  title="Strong Privacy"
-                  description="Stealth addresses, confidential amounts, and one-of-many proofs provide unlinkable transactions by default."
+                  title={keyConcepts.privacy.title}
+                  description={keyConcepts.privacy.description}
                   icon={<Eye className="h-6 w-6 text-secondary" />}
                   variant="privacy"
                 />
                 <KeyConcept
-                  title="Regulatory Compliance"
-                  description="Selective disclosure mechanisms and exchange-friendly workflows enable institutional adoption without backdoors."
+                  title={keyConcepts.compliance.title}
+                  description={keyConcepts.compliance.description}
                   icon={<Certificate className="h-6 w-6 text-destructive" />}
                   variant="compliance"
                 />
               </div>
             </section>
 
-            <Separator />
+            <div className="relative py-4">
+              <Separator className="border-border/60" />
+              <div className="absolute inset-x-0 -top-3 flex justify-center">
+                <Badge variant="outline" className="rounded-full border-primary/40 bg-background px-4 text-xs uppercase tracking-[0.4em] text-primary">
+                  {t.divider.deepDive}
+                </Badge>
+              </div>
+            </div>
 
-            <TechnicalSection title="1. Motivation & Goals" defaultOpen={true} id="motivation">
+            <TechnicalSection title={sectionCopy.motivation.title} defaultOpen={true} id="motivation">
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-destructive">Problem</h3>
-                <p>
-                  Public blockchains are powerful but face competing needs: auditability for regulators and 
-                  institutions; robust privacy for user safety and freedom; and cryptographic resilience as 
-                  quantum computing advances. Existing systems address at most two of these well. Privacy coins 
-                  often lack institutional compatibility; mainstream chains lack native privacy; nearly all 
-                  chains rely on ECC primitives vulnerable to Shor's algorithm in a full-scale universal 
-                  quantum computer.
-                </p>
+                <h3 className="text-lg font-semibold text-destructive">{sectionCopy.motivation.problemHeading}</h3>
+                <p dangerouslySetInnerHTML={{ __html: sectionCopy.motivation.problemParagraph }} />
 
-                <h3 className="text-lg font-semibold text-secondary">Goals</h3>
+                <h3 className="text-lg font-semibold text-secondary">{sectionCopy.motivation.goalsHeading}</h3>
                 <ul className="space-y-2">
-                  <li>• Native <strong>post-quantum signature scheme</strong> (primary) with conservative fallback(s).</li>
-                  <li>• Native <strong>privacy primitives</strong> that hide sender/recipient and amounts by default.</li>
-                  <li>• <strong>Selective disclosure</strong> facilities that let a user provide cryptographic proof of provenance.</li>
-                  <li>• <strong>Operational pragmatism</strong>: practical transaction sizes, reasonable verification costs.</li>
-                  <li>• <strong>Governance & transparency</strong> preventing authoritarian locking or secret keys.</li>
+                  {sectionCopy.motivation.goalsList.map(item => (
+                    <li key={item} dangerouslySetInnerHTML={{ __html: item }} />
+                  ))}
                 </ul>
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="2. Threat Model" id="threat-model">
+            <TechnicalSection title={sectionCopy.threatModel.title} id="threat-model">
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Adversaries Considered</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <Cpu className="h-4 w-4" />
-                        Quantum Adversary
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        Able to run Shor's/Grover's algorithms in the future
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <Network className="h-4 w-4" />
-                        Forensic Analyst
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        Attempting chain analytics to deanonymize users
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <Lock className="h-4 w-4" />
-                        Malicious Insiders
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        Single or small group attempting to misuse privileged keys
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <Certificate className="h-4 w-4" />
-                        Regulatory Coercion
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        Requests for disclosure, warrants, gag orders
-                      </p>
-                    </CardContent>
-                  </Card>
+                <h3 className="text-lg font-semibold">{sectionCopy.threatModel.introHeading}</h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {sectionCopy.threatModel.cards.map((card, index) => {
+                    const icon = threatIcons[index] ?? threatIcons[0]
+                    return (
+                      <Card key={card.title}>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="flex items-center gap-2 text-base">
+                            {icon}
+                            {card.title}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">{card.description}</p>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
                 </div>
-                <p className="text-sm text-muted-foreground italic">
-                  <strong>Note:</strong> We explicitly do not design to help evade lawful investigations, 
-                  but rather reduce attractiveness to criminals through compliant on/off ramps and 
-                  user-controlled disclosure mechanisms.
-                </p>
+                <p className="text-sm italic text-muted-foreground" dangerouslySetInnerHTML={{ __html: sectionCopy.threatModel.note }} />
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="3. High-level Architecture" id="architecture">
+            <TechnicalSection title={sectionCopy.architecture.title} id="architecture">
               <div className="space-y-4">
                 <ul className="space-y-3">
-                  <li><strong>Layer-1 UTXO model</strong> with privacy default (stealth outputs + confidential amounts)</li>
-                  <li><strong>Consensus:</strong> Configurable PoW for launch or hybrid PoW/PoS</li>
-                  <li><strong>Crypto stack:</strong> Multi-algorithm (crypto-agile) approach:
-                    <ul className="ml-6 mt-2 space-y-1">
-                      <li>• <em>Primary signature:</em> CRYSTALS-Dilithium (lattice-based)</li>
-                      <li>• <em>Fallback signature:</em> SPHINCS+ (hash-based)</li>
-                      <li>• <em>Zero-knowledge primitives:</em> STARK-style proofs</li>
-                      <li>• <em>Hash family:</em> SHA-2/SHA-3 family and BLAKE3</li>
-                    </ul>
-                  </li>
-                  <li><strong>Privacy primitives:</strong> Stealth addresses, confidential commitments, STARK-based one-of-many proofs</li>
-                  <li><strong>Light clients:</strong> Utreexo accumulator commitments and succinct proofs</li>
-                  <li><strong>Compliance primitives:</strong> Deposit-mode subaddresses + selective disclosure ZK proofs</li>
+                  {sectionCopy.architecture.bullets.map(bullet => (
+                    <li key={bullet.text}>
+                      <span dangerouslySetInnerHTML={{ __html: bullet.text }} />
+                      {bullet.items && (
+                        <ul className="ml-6 mt-2 space-y-1">
+                          {bullet.items.map(item => (
+                            <li key={item} dangerouslySetInnerHTML={{ __html: item }} />
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  ))}
                 </ul>
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="4. Cryptographic Choices & Rationale" id="cryptography">
+            <TechnicalSection title={sectionCopy.cryptography.title} id="cryptography">
               <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Primary Signature: CRYSTALS-Dilithium</h3>
-                  <p className="mb-2">
-                    <strong>Advantages:</strong> NIST acceptance family, reasonable signature sizes (~1–3 kB), 
-                    fast keygen/sign/verify. Good tradeoff for L1.
-                  </p>
-                </div>
+                {sectionCopy.cryptography.sections.map(section => (
+                  <div key={section.heading}>
+                    <h3 className="mb-3 text-lg font-semibold">{section.heading}</h3>
+                    <p className="mb-2" dangerouslySetInnerHTML={{ __html: section.paragraph }} />
+                    {section.list && (
+                      <ul className="ml-6 space-y-1">
+                        {section.list.map(item => (
+                          <li key={item} dangerouslySetInnerHTML={{ __html: item }} />
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
 
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Fallback Signature: SPHINCS+</h3>
-                  <p className="mb-2">
-                    <strong>Advantages:</strong> Hash-based, conservative, large signatures (tens of kB) but 
-                    resilience to unforeseen quantum advances; used as emergency fallback.
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Zero-knowledge: STARKs</h3>
-                  <p className="mb-2">
-                    <strong>Advantages:</strong> Transparent (no trusted setup) and hash-based primitives 
-                    resilient to quantum attacks. Use STARKs for:
-                  </p>
-                  <ul className="ml-6 space-y-1">
-                    <li>• <strong>Range proofs</strong> (confidential amounts)</li>
-                    <li>• <strong>One-of-many proofs</strong> (proving ownership of one output in a set)</li>
-                    <li>• <strong>Succinct light-client proofs</strong> (verify chain predicate w/o full chain)</li>
-                  </ul>
-                </div>
-
-                <Card className="bg-accent/5 border-accent/20">
+                <Card className="border-accent/20 bg-accent/5">
                   <CardHeader>
-                    <CardTitle className="text-base">Crypto-agility</CardTitle>
+                    <CardTitle className="text-base">{sectionCopy.cryptography.agilityCard.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm">
-                      The protocol includes a versioning system for signature and proof primitives. 
-                      Blocks and transaction witnesses include algorithm version tags. New primitives 
-                      can be introduced as protocol upgrades without invalidating old outputs.
-                    </p>
+                    <p className="text-sm">{sectionCopy.cryptography.agilityCard.paragraph}</p>
                   </CardContent>
                 </Card>
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="5. Transaction Model (UTXO, Privacy Features)" id="transaction-model">
+            <TechnicalSection title={sectionCopy.transactionModel.title} id="transaction-model">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">Overview</h3>
-                  <p>UTXO outputs carry:</p>
-                  <ul className="ml-6 space-y-1 mt-2">
-                    <li>• A one-time stealth destination derivation (unlinkable to recipient)</li>
-                    <li>• A commitment to value (confidential)</li>
-                    <li>• A small public tag for optional auditing or exchange deposit association</li>
+                  <h3 className="mb-3 text-lg font-semibold">{sectionCopy.transactionModel.overviewHeading}</h3>
+                  <p>{sectionCopy.transactionModel.overviewIntro}</p>
+                  <ul className="ml-6 mt-2 space-y-1">
+                    {sectionCopy.transactionModel.overviewBullets.map(item => (
+                      <li key={item}>{item}</li>
+                    ))}
                   </ul>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">Privacy Primitives in a Transaction</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm">Stealth Addresses</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-xs text-muted-foreground">
-                          Recipient publishes scan/spend keys. Sender derives unique one-time public key.
-                        </p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm">Confidential Amounts</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-xs text-muted-foreground">
-                          Values hidden in commitments with range proofs for non-negative amounts.
-                        </p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm">One-of-Many Proofs</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-xs text-muted-foreground">
-                          STARK-based proof of membership in anonymity set with linkability tags.
-                        </p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm">View Keys</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-xs text-muted-foreground">
-                          Optional tokens for specific parties to scan outputs to subaddresses.
-                        </p>
-                      </CardContent>
-                    </Card>
+                  <h3 className="mb-3 text-lg font-semibold">{sectionCopy.transactionModel.primitivesHeading}</h3>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {sectionCopy.transactionModel.primitives.map(item => (
+                      <Card key={item.title}>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">{item.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-xs text-muted-foreground">{item.description}</p>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
                 </div>
 
                 <CodeBlock 
-                  code={transactionExample}
+                  code={sectionCopy.transactionModel.code}
                   language="rust"
-                  title="Transaction Structure (Conceptual)"
+                  title={sectionCopy.transactionModel.codeTitle}
                 />
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="6. One-of-Many Spend Flow (Plain English)" id="spend-flow">
+            <TechnicalSection title={sectionCopy.spendFlow.title} id="spend-flow">
               <div className="space-y-4">
-                <p>When a wallet wants to spend a UTXO privately:</p>
-                <ol className="list-decimal list-inside space-y-2 ml-4">
-                  <li>The wallet selects a <strong>decoy set</strong> of existing outputs (the "anonymity set")</li>
-                  <li>The wallet produces a <strong>STARK proof</strong> that <em>one</em> of those outputs is truly owned</li>
-                  <li>The proof does <strong>not reveal which one</strong>, but produces a <strong>spend tag</strong></li>
-                  <li>If the same UTXO were spent twice, the tags match and double-spend is detectable</li>
-                  <li>Miner/validator verifies the STARK proof and the spend is accepted</li>
+                <p>{sectionCopy.spendFlow.intro}</p>
+                <ol className="ml-4 list-decimal list-inside space-y-2">
+                  {sectionCopy.spendFlow.steps.map(step => (
+                    <li key={step} dangerouslySetInnerHTML={{ __html: step }} />
+                  ))}
                 </ol>
                 <Card className="bg-secondary/5 border-secondary/20">
                   <CardContent className="pt-4">
-                    <p className="text-sm">
-                      <strong>Conceptually:</strong> This is like Monero ring signatures but implemented with 
-                      STARK-based circuits and post-quantum signatures.
-                    </p>
+                    <p className="text-sm" dangerouslySetInnerHTML={{ __html: sectionCopy.spendFlow.cardText }} />
                   </CardContent>
                 </Card>
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="10. Wallet UX & Compliance Modes" id="wallet-ux">
+            <TechnicalSection title={sectionCopy.walletUx.title} id="wallet-ux">
               <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Default UX</h3>
-                  <p>
-                    All peer-to-peer payments default to private mode (stealth addresses + confidential amounts). 
-                    Simple UI: <strong>"Send privately"</strong>.
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Exchange Deposit Mode</h3>
-                  <p className="mb-3">When sending to an exchange, the wallet offers <strong>"Deposit (exchange mode)"</strong>:</p>
-                  <ol className="list-decimal list-inside space-y-2 ml-4">
-                    <li>Exchange generates a <strong>deposit subaddress</strong> tied to a KYC account</li>
-                    <li>Wallet sends funds to that subaddress with exchange view token</li>
-                    <li>Public chain shows stealth output, but exchange can reconcile deposits</li>
-                    <li>For suspicious deposits, wallet can generate <strong>audit packet</strong> per user consent</li>
-                  </ol>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">One-click Auditor Disclosure</h3>
-                  <p>
-                    Wallet UX presents plainly what is disclosed when the user creates an audit packet, 
-                    maintaining transparency about privacy trade-offs.
-                  </p>
-                </div>
+                {sectionCopy.walletUx.blocks.map(block => (
+                  <div key={block.heading}>
+                    <h3 className="mb-3 text-lg font-semibold">{block.heading}</h3>
+                    {block.paragraphs.map(paragraph => (
+                      <p key={paragraph} className="mb-3 last:mb-0" dangerouslySetInnerHTML={{ __html: paragraph }} />
+                    ))}
+                    {block.list && (
+                      <ol className="ml-4 list-decimal list-inside space-y-2">
+                        {block.list.map(item => (
+                          <li key={item} dangerouslySetInnerHTML={{ __html: item }} />
+                        ))}
+                      </ol>
+                    )}
+                  </div>
+                ))}
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="17. Roadmap & MVP" id="roadmap">
+            <TechnicalSection title={sectionCopy.roadmap.title} id="roadmap">
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <Card className="border-primary/20 bg-primary/5">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Phase 0 (0-3 months)</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-xs text-muted-foreground">
-                        Foundation, legal, core team; research; primitive choices; skeleton repo
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-secondary/20 bg-secondary/5">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Phase 1 (3-9 months)</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-xs text-muted-foreground">
-                        Core L1 node: UTXO, Dilithium signatures, basic PoW, stealth outputs; testnet
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-accent/20 bg-accent/5">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Phase 2 (9-18 months)</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-xs text-muted-foreground">
-                        Add STARK privacy; wallet client; exchange SDK; comprehensive audits
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-destructive/20 bg-destructive/5">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Phase 3 (18-30 months)</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-xs text-muted-foreground">
-                        Utreexo support; light clients; L2 rollup prototype; ecosystem grants
-                      </p>
-                    </CardContent>
-                  </Card>
+                  {sectionCopy.roadmap.phases.map((phase, index) => {
+                    const cardClasses = [
+                      "border-primary/20 bg-primary/5",
+                      "border-secondary/20 bg-secondary/5",
+                      "border-accent/20 bg-accent/5",
+                      "border-destructive/20 bg-destructive/5"
+                    ]
+                    return (
+                      <Card key={phase.title} className={cardClasses[index] ?? "border-border/60 bg-background/80"}>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">{phase.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-xs text-muted-foreground">{phase.description}</p>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
                 </div>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Post-Launch Goals</CardTitle>
+                    <CardTitle className="text-base">{sectionCopy.roadmap.postLaunchHeading}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm">
-                      Iterative upgrades (crypto-agility), hardware wallet integration, 
-                      multi-jurisdictional expansion, and continued research partnerships.
-                    </p>
+                    <p className="text-sm">{sectionCopy.roadmap.postLaunchParagraph}</p>
                   </CardContent>
                 </Card>
               </div>
             </TechnicalSection>
 
-            <TechnicalSection title="21. Conclusion" id="conclusion">
+            <TechnicalSection title={sectionCopy.conclusion.title} id="conclusion">
               <div className="space-y-4">
-                <p>
-                  PQ-PRIV aims to prove that <strong>privacy and legal compliance are not mutually exclusive</strong> and 
-                  that post-quantum safety can be engineered as a first-class property of a ledger. The design 
-                  leverages modern STARKs, lattice signatures and prudent governance to deliver a practical, 
-                  implementable chain that protects user privacy while offering real rails for exchanges and institutions.
-                </p>
-                <p>
-                  The engineering challenge is substantial — but the path is clear: <strong>layered rollout, 
-                  heavy auditing, and a disciplined governance model</strong>.
-                </p>
+                {sectionCopy.conclusion.paragraphs.map(paragraph => (
+                  <p key={paragraph} dangerouslySetInnerHTML={{ __html: paragraph }} />
+                ))}
                 <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
                   <CardContent className="pt-6">
-                    <p className="text-center font-medium">
-                      Building the future of private, post-quantum secure digital money
-                    </p>
+                    <p className="text-center font-medium">{sectionCopy.conclusion.cardText}</p>
                   </CardContent>
                 </Card>
               </div>
             </TechnicalSection>
+
+            <div className="rounded-3xl border border-border/60 bg-background/90 p-8 shadow-inner shadow-primary/5 backdrop-blur">
+              <h2 className="text-center text-xl font-semibold tracking-tight text-muted-foreground">
+                {t.infoBanner}
+              </h2>
+            </div>
           </main>
         </div>
       </div>
 
-      <footer className="border-t border-border bg-muted/30 py-8 mt-16">
-        <div className="container text-center text-sm text-muted-foreground">
-          <p>
-            PQ-PRIV Whitepaper v0.9 Draft | Project Team (pseudonymous) | 2025-10-03
-          </p>
-          <p className="mt-2">
-            This document is for research and educational purposes. All cryptographic implementations 
-            require extensive auditing before production use.
-          </p>
-        </div>
-      </footer>
+        <footer className="border-t border-border/60 bg-muted/20 py-10">
+          <div className="container space-y-4 text-center text-sm text-muted-foreground">
+            <div className="flex items-center justify-center gap-2 text-foreground">
+              <Shield className="h-5 w-5 text-primary" />
+              <span className="font-semibold tracking-tight">{t.header.projectTagline}</span>
+            </div>
+            <p>{t.footer.line1}</p>
+            <p className="text-xs text-muted-foreground/80">{footerLine2}</p>
+          </div>
+        </footer>
+      </div>
+
+      <ScrollToTop label={t.scrollToTop} />
     </div>
   )
 }
